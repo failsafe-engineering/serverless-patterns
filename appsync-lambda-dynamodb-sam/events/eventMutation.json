@@ -1,0 +1,10 @@
+{
+  "field": "addPost",
+  "arguments": {
+    "id": "3",
+    "author": "Travis Bickle",
+    "title": "Mean motherf!@£$",
+    "content": "Nah... mean is ok"
+  },
+  "source": null
+}

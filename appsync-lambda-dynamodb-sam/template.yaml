@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  GraphQLAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./gql/schema.gql
+      Auth:
+        Type: API_KEY
+      ApiKeys:
+        ApiKey:
+          Description: api key
+      DataSources:
+        Lambda:
+          LambdaDataSource:
+            FunctionArn: !GetAtt Resolver.Arn
+      Functions:
+        lambdaInvoker:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: LambdaDataSource
+          CodeUri: ./gql/invoker.js
+      Resolvers:
+        Mutation:
+          addPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - lambdaInvoker
+        Query:
+          getPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - lambdaInvoker
+
+  Resolver:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: dist/index.handler
+      Runtime: nodejs18.x
+      Architectures:
+      - x86_64
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Platform: node
+        Target: node18
+        Sourcemap: true
+        EntryPoints:
+        - index.js
+
+  Table:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: 'appsync-lambda-dynamodb-sam-posts'
+      PrimaryKey:
+        Name: id
+        Type: String
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: Resolver
+      Destination:
+        Id: Table
+      Permissions:
+        - Write
+        - Read
+
+Outputs:
+  GraphQLAPIARN:
+    Description: GraphQLAPI ARN
+    Value: !GetAtt GraphQLAPI.Arn
+  ResolverARN:
+    Description: Resolver Lambda Function ARN
+    Value: !GetAtt Resolver.Arn
+  TableARN:
+    Description: DynamoDb Table ARN
+    Value: !GetAtt Table.Arn

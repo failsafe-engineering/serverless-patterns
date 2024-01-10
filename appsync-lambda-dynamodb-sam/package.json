@@ -1,0 +1,31 @@
+{
+  "name": "appsync-lambda-dynamodb-sam",
+  "version": "0.0.1",
+  "description": "AWS Serverless pattern",
+  "main": "dist/index.js",
+  "scripts": {
+    "compile": "tsc",
+    "build": "npm run compile && sam build"
+  },
+  "keywords": [
+    "aws",
+    "sam",
+    "appsync",
+    "lambda",
+    "dynamodb",
+    "serverless",
+    "pattern"
+  ],
+  "author": "Failsafe Engineering, <hello@failsafe.engineering>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/node": "^20.10.6",
+    "esbuild": "^0.19.11",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.485.0",
+    "@aws-sdk/lib-dynamodb": "^3.485.0"
+  }
+}

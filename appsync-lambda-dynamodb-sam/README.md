@@ -1,0 +1,1 @@
+# appsync-lambda-dynamodb-sam
